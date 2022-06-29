@@ -46,7 +46,7 @@
                             {{isPublic(blog.public)}}
                         </div>
                         <div class="data-location">
-                            {{getLocation(blog.position)}}
+                            {{location(blog.position)}}
                         </div>
                         <div class="data-date_public">
                             {{blog.data_pubblic}}
@@ -55,7 +55,7 @@
                             <NuxtLink class="btn-Edit" :to="{ name: 'CreateEditPage', params: { id: blog.id}}">Edit</NuxtLink>
                         </div>
                         <div class="data-delete">
-                            <button type="button" class="btn-Delete" @click="Delete_Onclick(blog.id)">Delete</button>
+                            <button type="button" class="btn-Delete" @click="confirmDelete(blog.id)">Delete</button>
                         </div>
                     </div>
                 </li>
@@ -64,54 +64,71 @@
     </div>
 </template>
 <script>
+    import mainJs from '../../assets/js/main.js';
     export default{
         props : ['listBlog'],
         methods: {
-            isPublic (a) {
-                if(a==true){
+
+            /// <summary>
+            /// method isPublic (a) to get value of public by String
+            /// </summary>
+            /// <param name="publicByBool"></param>
+            /// <returns>string of public</returns>
+            isPublic (publicByBool) {
+                if(publicByBool==true){
                     return "Yes";
                 }
                 else{
                     return "No";
                 }
             },
-            getLocation ( list) {
+
+            /// <summary>
+            /// method location ( listPosition ) to get position of blog by String
+            /// </summary>
+            /// <param name="listPosition"></param>
+            /// <returns>string of position</returns>
+            location ( listPosition ) {
                 var listLocation=["Việt Nam", "Châu Á", "Châu Âu", "Châu Mỹ"];
-                var Result = "";
-                for(var i= 0; i<list.length; i++){
-                    Result += listLocation[list[i]-1]+" ";
+                var position = "";
+                for(var i= 0; i<listPosition.length; i++){
+                    position += listLocation[listPosition[i]-1]+" ";
                 }
-                return Result;
+                return position;
             },
-            Edit(idEdit) {
-                EventBus.$emit('id', idEdit);
-            },
-            sendMessage() {
-                EventBus.$emit('inputData', this.tempMessage);
-                this.tempMessage = '';
-            },
-            Delete_Onclick(id) {
+            /// <summary>
+            /// function confirmDelete(id) to confirm delete Blog 
+            /// </summary>
+            /// <param name="id"></param>
+            /// <returns>response.json()</returns>
+            confirmDelete(id) {
                 if (confirm('Do you want to delete this Blog?')) {
-                    dellBlog(id);
+                    this.dellBlog(id);
+                    this.$router.push("/");
                 } else {
                     alert("Cancelled");
                 }
-                // 
             },
+            /// <summary>
+            /// function dellBlog(id) to delete data from API
+            /// </summary>
+            /// <param name="url"></param>
+            /// <param name="data"></param>
+            /// <returns>response.json()</returns>
+            dellBlog(id){
+            var option ={
+                method: 'DELETE',
+                header:{
+                    'Content-Type' : 'application/json'
+                },
+            };
+            fetch('http://localhost:3000/blogs/'+id, option)
+                .then(function(response) {
+                    response.json();
+                });
+            location.reload();
+            alert("successful delete!");
+            }
         }
-    }
-    function dellBlog(id){
-        var option ={
-            method: 'DELETE',
-            header:{
-                'Content-Type' : 'application/json'
-            },
-        };
-        fetch('http://localhost:3000/blogs/'+id, option)
-            .then(function(response) {
-                response.json();
-            });
-        location.reload();
-        alert("successful delete!");
     }
 </script>

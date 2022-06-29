@@ -23,6 +23,10 @@
           };
       },
       methods: {
+        /// <summary>
+        /// method changeCurrentId(newId) to change currentId of Blog
+        /// </summary>
+        /// <param name="newId"></param>
         changeCurrentId(newId) {
           this.currentId = newId;
         },

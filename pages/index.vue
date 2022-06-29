@@ -1,10 +1,6 @@
 <template>
   <div>
-    <div>
-      <div>
-        <BlogList :listBlog = "listBlog"></BlogList>
-      </div>
-    </div>
+    <BlogList :listBlog = "listBlog"></BlogList>
   </div>
 </template>
 <script>
@@ -35,9 +31,6 @@
             listBlog: [],
           };
       },
-      methods: {
-        
-      }
   };
   require('../assets/css/main.css');
 </script>

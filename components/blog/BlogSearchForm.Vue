@@ -9,7 +9,7 @@
             <input id="txtKeySearch" class= "input-search" type="text" placeholder="Search" v-model="key">
         </div>
         <div class="button-search-contairner">
-            <button class="btnSearch" @click="KeySearch">Search</button>
+            <button class="btnSearch" @click="search">Search</button>
         </div>
     </div>
 </template>
@@ -21,7 +21,10 @@
           };
         },
         methods: {
-            KeySearch() {
+            /// <summary>
+            /// method search() to set keySearch of parent conponet
+            /// </summary>
+            search() {
                 this.$emit('newKeySearch', this.key);
             },
         }

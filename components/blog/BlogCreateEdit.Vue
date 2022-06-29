@@ -46,18 +46,24 @@
             </div>
         </div>
         <div class="footer-CreateEdit">
-            <button type="button" class="btnSubmit" @click="btnSubmit_Onclik">Submit</button>
-            <button type="button" class="btnClear" @click="Clear">Clear</button>
+            <button type="button" class="btnSubmit" @click="submit">Submit</button>
+            <button type="button" class="btnClear" @click="clear">Clear</button>
         </div>
     </div>
 </template>
 <script>
-import EventBus from '../../assets/js/EventBus.js';
+import EventBus from '../../assets/js/main.js';
+const listCategory= [{id: 0, name: "Kinh tế"}, {id: 1, name: "Thế Giới"}, {id: 2, name: "Chính Trị"}, {id: 4, name: "Chính Trị"}, {id: 3, name: "Thời Sự"}, {id: 4, name: "Giải Trí"}, {id: 5, name: "Kinh Doanh"}, {id: 6, name: "Giáo Dục"}, {id: 7, name: "Thể Thao"}, {id: 8, name: "Thể Thao"}, {id: 9, name: "Thể Thao"}, {id: 10, name: "Thể Thao"}, {id: 11, name: "Thể Thao"}];
+const apiHref= 'http://localhost:3000/blogs?id=';
 export default { 
+    /// <summary>
+    /// functon fetch() to set current Blog
+    /// </summary>
+    /// <returns></returns>
     async fetch(){
         if(this.currentId!='0'){
             console.log(this.currentId);
-            var listBlog= await fetch('http://localhost:3000/blogs?id='+this.currentId)
+            var listBlog= await fetch(apiHref+this.currentId)
                 .then((res)=>res.json());
             var blog=listBlog.find(x=>x.id===this.currentId);
             console.log(blog)
@@ -67,11 +73,11 @@ export default {
             this.Data_pubblic= blog.data_pubblic;
             this.Category= this.Categorys.find(x=>x.id===blog.category).name;
             this.Position= blog.position;
+            this.Public= blog.public;
         }
     },
     data(){
         return{
-            Categorys: [{id: 0, name: "Kinh tế"}, {id: 1, name: "Thế Giới"}, {id: 2, name: "Chính Trị"}, {id: 4, name: "Thời Sự"}, {id: 3, name: "Thời Sự"}, {id: 4, name: "Giải Trí"}, {id: 5, name: "Kinh Doanh"}, {id: 6, name: "Giáo Dục"}, {id: 7, name: "Thể Thao"}, {id: 8, name: "Thể Thao"}, {id: 9, name: "Thể Thao"}, {id: 10, name: "Thể Thao"}, {id: 11, name: "Thể Thao"}],
             Title: '',
             Des:'',
             Detail:'',
@@ -80,16 +86,15 @@ export default {
             Position:[],
             Public: true,
             currentId: this.$route.params.id,
+            Categorys: listCategory,
         };
     },
     methods: {
-        getIdCategory(){
-            console.log(this.Title);
-        },
-        sendType(type) {
-            this.$emit('inputData', type);
-        },
-        btnSubmit_Onclik(){
+
+        /// <summary>
+        /// method submit() submit Blog into API
+        /// </summary>
+        submit(){
             if(this.Title.length==0||this.Des.length==0||this.Detail.length==0||this.Data_pubblic.length==0){
                     alert("Vui lòng nhập đầy đủ thông tin");
                 return;
@@ -112,21 +117,78 @@ export default {
                     thumbs: "amess.jpg",
             };
             if(this.currentId== 0){
-                postData('http://localhost:3000/blogs', dataBlog)
+                this.create(dataBlog);
+            }
+            else if(this.currentId!=0){
+                this.edit(dataBlog);
+            }
+        },
+
+        /// <summary>
+        /// method create(dataBlog) Create new Blog in Api
+        /// </summary>
+        /// <param name="dataBlog"></param>
+        create(dataBlog){
+            this.postData('http://localhost:3000/blogs', dataBlog)
                     .then(data => {
                         alert("Post thành công!");
                     });
                     this.$router.push("/");
-            }
-            else if(this.currentId!=0){
-                putData('http://localhost:3000/blogs/'+this.currentId, dataBlog)
+        },
+        /// <summary>
+        /// function postData(url = '', data = {}) to post data into API
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="data"></param>
+        /// <returns>response.json()</returns>
+        async postData(url = '', data = {}) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                redirect: 'follow', 
+                referrerPolicy: 'no-referrer', 
+                body: JSON.stringify(data) 
+            });
+            return response.json(); 
+        },
+
+        /// <summary>
+        /// method edit(dataBlog) edit current Blog in Api
+        /// </summary>
+        /// <param name="dataBlog"></param>
+        /// <returns></returns>
+        edit(dataBlog){
+            this.putData('http://localhost:3000/blogs/'+this.currentId, dataBlog)
                     .then(data => {
                         alert("Successful PUT!");
                     });
                 this.$router.push("/");
-            }
         },
-        Clear(){
+
+        /// <summary>
+        /// function putData(url = '', data = {}) to put data in API
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="data"></param>
+        /// <returns>response.json()</returns>
+        async putData(url = '', data = {}) {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data) 
+            });
+            return response.json();
+        },
+
+        /// <summary>
+        /// method clear() to clear every control in this component
+        /// </summary>
+        /// <param name="dataBlog"></param>
+        clear(){
             this.Title= '';
             this.Des='';
             this.Detail='';
@@ -138,26 +200,5 @@ export default {
         }
     }
 }
-async function postData(url = '', data = {}) {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    redirect: 'follow', 
-    referrerPolicy: 'no-referrer', 
-    body: JSON.stringify(data) 
-  });
-  return response.json(); 
-}
-async function putData(url = '', data = {}) {
-  const response = await fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data) 
-  });
-  return response.json();
-}
+    
 </script>

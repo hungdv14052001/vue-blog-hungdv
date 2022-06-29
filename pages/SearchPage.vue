@@ -37,6 +37,11 @@
           };
       },
       methods: {
+        /// <summary>
+        /// method newKeySearch(newKey) to edit keySearch and change this listBlog by key Search
+        /// </summary>
+        /// <param name="newKey"></param>
+        /// <returns></returns>
         newKeySearch(newKey){
           this.keySearch= newKey.toLowerCase();
           this.listBlogSearch= this.listBlog.filter(function(blog){
